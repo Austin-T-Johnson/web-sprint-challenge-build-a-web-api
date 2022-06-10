@@ -5,13 +5,7 @@ const router = express.Router();
 router.get('/', (req,res,next) => {
     Projects.get()
         .then(projects => {
-            if(projects){
-                res.json(projects)
-             
-            } else {
-                res.json([]);
-               
-            }
+           res.json(projects)
         })
         .catch(next)
 })
