@@ -1,8 +1,9 @@
 const express = require('express');
 const Projects = require('./projects-model');
+const Actions = require('../actions/actions-model');
 const router = express.Router();
 
-const { validateId, validateProject, validateUpdatedProject } = require('./projects-middleware');
+const { validateId, validateProject, validateId2 } = require('./projects-middleware');
 
 router.get('/', (req, res, next) => {
     Projects.get()
@@ -25,7 +26,7 @@ router.post('/', validateProject, (req, res, next) => {
         .catch(next)
 })
 
-router.put('/:id', validateId, validateUpdatedProject, (req, res, next) => {
+router.put('/:id', validateId, validateProject, (req, res, next) => {
     Projects.update(req.params.id, req.body)
         .then(updatedProject => {
             res.status(200).json(
@@ -47,6 +48,13 @@ router.delete('/:id', validateId, async (req, res, next) => {
     } catch (error) {
         next(error)
     }
+})
+
+router.get('/:id/actions', async (req, res, next) => {
+    let actions = await Actions.get()
+    let id = req.params.id
+    actions = actions.filter((item) => item.project_id == id)
+    res.json(actions)
 })
 
 
