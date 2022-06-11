@@ -2,12 +2,12 @@ const express = require('express');
 const Projects = require('./projects-model');
 const router = express.Router();
 
-const { validateId, validateProject } = require('./projects-middleware');
+const { validateId, validateProject, validateUpdatedProject } = require('./projects-middleware');
 
 router.get('/', (req, res, next) => {
     Projects.get()
         .then(projects => {
-           res.json(projects)
+            res.json(projects)
         })
         .catch(next)
 })
@@ -18,21 +18,24 @@ router.get('/:id', validateId, (req, res) => {
 
 
 router.post('/', validateProject, (req, res, next) => {
-    Projects.insert({ name: req.name, description: req.description, completed: req.completed})
+    Projects.insert(req.body)
         .then(newProject => {
             res.status(201).json(newProject)
         })
         .catch(next)
-    })
+})
 
-router.put('/:id', validateId, validateProject, (req, res, next) => {
-    Projects.update(req.params.id, { name: req.name, description: req.description, completed: req.completed})
-        .then(() => {
-            return Projects.get(req.params.id)
+router.put('/:id', validateId, validateUpdatedProject, (req, res, next) => {
+    Projects.update(req.params.id, req.body)
+        .then(updatedProject => {
+            res.status(200).json(
+                {
+                    name: updatedProject.name,
+                    description: updatedProject.description,
+                    completed: updatedProject.completed
+                })
         })
-        .then(project => {
-            res.json(project)
-        })
+
         .catch(next)
 })
 

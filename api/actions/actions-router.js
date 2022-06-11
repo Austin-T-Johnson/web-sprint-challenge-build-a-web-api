@@ -15,12 +15,29 @@ router.get('/:id', validateId, (req, res, next) => {
 })
 
 router.post('/', validateAction, (req, res, next) => {
-    Actions.insert({ project_id: req.project_id, description: req.description, notes: req.notes, completed: req.completed})
+    Actions.insert(req.body)
         .then(newAction => {
             res.status(201).json(newAction)
         })
         .catch(next)
     })
+
+    router.put('/:id', validateId, validateAction, (req, res, next) => {
+       Actions.update(req.params.id, req.body)
+            .then(updatedActions => {
+                res.status(200).json(
+                    {
+                        project_id: updatedActions.project_id,
+                        description: updatedActions.description,
+                        notes: updatedActions.notes,
+                        completed: updatedActions.completed,
+                        id: updatedActions.id
+                    })
+            })
+    
+            .catch(next)
+    })
+    
 
 
 router.delete('/:id', validateId, async (req, res, next) => {
